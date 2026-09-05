@@ -225,7 +225,7 @@ AI-Decoded-From-Models-to-Hugging-Face/
 ├── main.py
 ├── README.md
 ├── requirements.txt
-└── .gitignore
+
 ```
 
 ### `main.py`
