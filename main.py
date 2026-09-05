@@ -1,47 +1,27 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-
-# ---------------------------------------------------------
-# MODEL INFORMATION
-# ---------------------------------------------------------
-
-# Open-source Hugging Face model used in this project
 MODEL_NAME = "google/flan-t5-small"
 
-
-# ---------------------------------------------------------
-# LOAD MODEL
-# ---------------------------------------------------------
 
 def load_model():
     """Load the tokenizer and FLAN-T5 model."""
 
     print("Loading model:", MODEL_NAME)
 
-    # Load the tokenizer
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-    # Load the model
     model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
     # Use GPU if available, otherwise use CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Move the model to the selected device
     model = model.to(device)
-
-    # Set the model to evaluation mode
     model.eval()
 
     print("Using device:", device)
 
     return tokenizer, model, device
 
-
-# ---------------------------------------------------------
-# GENERATE OUTPUT
-# ---------------------------------------------------------
 
 def generate_output(prompt, tokenizer, model, device):
     """Generate text from the model for a given prompt."""
@@ -54,7 +34,7 @@ def generate_output(prompt, tokenizer, model, device):
         max_length=512
     )
 
-    # Move the input tensors to the selected device
+    # Move the input to the same device as the model
     inputs = {
         key: value.to(device)
         for key, value in inputs.items()
@@ -68,7 +48,7 @@ def generate_output(prompt, tokenizer, model, device):
             num_beams=4
         )
 
-    # Convert tokens back into readable text
+    # Convert the generated tokens back into text
     result = tokenizer.decode(
         outputs[0],
         skip_special_tokens=True
@@ -77,22 +57,12 @@ def generate_output(prompt, tokenizer, model, device):
     return result
 
 
-# ---------------------------------------------------------
-# RUN EXPERIMENTS
-# ---------------------------------------------------------
-
 def run_experiments(tokenizer, model, device):
-    """Run sample text-to-text tasks."""
+    """Run different text-to-text experiments."""
 
     experiments = [
+        ("Translation", "translate English to French: Hello"),
 
-        # Translation
-        (
-            "Translation",
-            "translate English to French: Hello"
-        ),
-
-        # Summarization
         (
             "Summarization",
             "summarize: Python is a programming language "
@@ -100,20 +70,17 @@ def run_experiments(tokenizer, model, device):
             "analyze data, and develop artificial intelligence."
         ),
 
-        # Sentiment classification
         (
             "Sentiment Classification",
             "classify the sentiment as positive or negative: "
             "I love this product."
         ),
 
-        # Explanation
         (
             "Simple Explanation",
             "Explain artificial intelligence in one short sentence."
         ),
 
-        # Question answering
         (
             "Question Answering",
             "Question: What is the largest planet in our solar system? "
@@ -126,7 +93,6 @@ def run_experiments(tokenizer, model, device):
     print("=" * 70)
 
     for task, prompt in experiments:
-
         print("\nTask:", task)
         print("Input:", prompt)
 
@@ -140,10 +106,6 @@ def run_experiments(tokenizer, model, device):
         print("Output:", output)
 
 
-# ---------------------------------------------------------
-# INTERACTIVE MODE
-# ---------------------------------------------------------
-
 def interactive_mode(tokenizer, model, device):
     """Allow the user to enter custom prompts."""
 
@@ -155,20 +117,16 @@ def interactive_mode(tokenizer, model, device):
     print("Type 'exit' to stop the program.")
 
     while True:
-
         prompt = input("\nEnter prompt: ").strip()
 
-        # Stop the program
         if prompt.lower() == "exit":
             print("Program ended.")
             break
 
-        # Handle empty input
         if not prompt:
             print("Please enter a prompt.")
             continue
 
-        # Generate the response
         output = generate_output(
             prompt,
             tokenizer,
@@ -179,33 +137,16 @@ def interactive_mode(tokenizer, model, device):
         print("Output:", output)
 
 
-# ---------------------------------------------------------
-# MAIN PROGRAM
-# ---------------------------------------------------------
-
 def main():
-
-    # Load model, tokenizer and device
+    # Load the model and tokenizer
     tokenizer, model, device = load_model()
 
-    # Run predefined experiments
-    run_experiments(
-        tokenizer,
-        model,
-        device
-    )
+    # Run the sample experiments
+    run_experiments(tokenizer, model, device)
 
-    # Allow the user to test custom prompts
-    interactive_mode(
-        tokenizer,
-        model,
-        device
-    )
+    # Allow the user to enter custom prompts
+    interactive_mode(tokenizer, model, device)
 
-
-# ---------------------------------------------------------
-# START PROGRAM
-# ---------------------------------------------------------
 
 if __name__ == "__main__":
     main()
